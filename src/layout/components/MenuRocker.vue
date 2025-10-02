@@ -17,7 +17,34 @@
 						<a class="nav-link" href="/">
 							<div class="parent-icon"><i class="bx bx-home-circle"></i>
 							</div>
-							<div class="menu-title">Home</div>
+							<div class="menu-title">Sản Phẩm</div>
+						</a>
+					</router-link>
+				</li>
+				<li class="nav-item">
+					<router-link to="/nhan-vien">
+						<a class="nav-link" href="/nhan-vien">
+							<div class="parent-icon"><i class="bx bx-home-circle"></i>
+							</div>
+							<div class="menu-title">Nhân Viên</div>
+						</a>
+					</router-link>
+				</li>
+				<li class="nav-item">
+					<router-link to="/Mon-an">
+						<a class="nav-link" href="/Mon-an">
+							<div class="parent-icon"><i class="bx bx-home-circle"></i>
+							</div>
+							<div class="menu-title">Món Ăn</div>
+						</a>
+					</router-link>
+				</li>
+				<li class="nav-item">
+					<router-link to="/dai-ly">
+						<a class="nav-link" href="/dai-ly">
+							<div class="parent-icon"><i class="bx bx-home-circle"></i>
+							</div>
+							<div class="menu-title">Đại Lý</div>
 						</a>
 					</router-link>
 				</li>

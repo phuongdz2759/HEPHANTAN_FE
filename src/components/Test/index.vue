@@ -1,315 +1,265 @@
 <template>
-	<div class="stock-realtime">
-		<h2>Chứng khoán Realtime (Demo)</h2>
-		<table class="stock-table">
-			<thead>
-				<tr>
-					<th>Mã</th>
-					<th>Giá</th>
-					<th>Thay đổi</th>
-					<th>Khối lượng</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="stock in stocks" :key="stock.code">
-					<td>{{ stock.code }}</td>
-					<td :class="priceClass(stock)">{{ stock.price.toFixed(2) }}</td>
-					<td :class="changeClass(stock)">
-						{{ stock.change > 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}
-					</td>
-					<td>{{ stock.volume }}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="chart-container">
-		<h3>Biểu đồ biến động giá: {{ stocks[0].code }}</h3>
-		<div id="stockChart" style="height: 300px;"></div>
-	</div>
-</template>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <div class="row">
+        <div class="col-12">
+            <div class="card radius-10 border-top border-0 border-3 border-info">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-lg-3 col-xl-3">
+                            <h4>Danh Sách Sản Phẩm</h4>
+                        </div>
+                        <div class="col-lg-9 col-xl-9">
+                            <div class="float-lg-end">
+                                <div class="row row-cols-lg-2 row-cols-xl-auto g-2">
+                                    <div class="col">
+                                        <div class="position-relative">
+                                            <input v-model="search_tag" type="text" class="form-control ps-5"
+                                                placeholder="Search Product..."> <span
+                                                class="position-absolute top-50 product-show translate-middle-y"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="btn-group" role="group"
+                                            aria-label="Button group with nested dropdown">
+                                            <button type="button" class="btn btn-white">Sắp Xếp</button>
+                                            <div class="btn-group" role="group">
+                                                <button id="btnGroupDrop1" type="button"
+                                                    class="btn btn-white dropdown-toggle dropdown-toggle-nocaret px-1"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fa-solid fa-arrow-down-short-wide"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-xxl-end" aria-labelledby="btnGroupDrop1">
+                                                    <li><a  class="dropdown-item" href="#">A - Z</a>
+                                                    </li>
+                                                    <li><a  class="dropdown-item" href="#">Z - A</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-white">Khoảng Giá</button>
+                                            <div class="btn-group" role="group">
+                                                <button id="btnGroupDrop1" type="button"
+                                                    class="btn btn-white dropdown-toggle dropdown-toggle-nocaret px-1"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fa-solid fa-circle-arrow-down"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-xxl-end " style="width: 400px;"
+                                                    aria-labelledby="btnGroupDrop1">
+                                                    <li>
+                                                        <div class="dropdown-header">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="row">
+                                                                        <div class="col-4">
+                                                                            <input v-model="begin" class="form-control"
+                                                                                placeholder="0 đ" type="text"></div>
+                                                                        <div class="col-2" style="padding: 0px 0px">
+                                                                            <hr>
+                                                                        </div>
+                                                                        <div class="col-6"><input v-model="end" class="form-control"
+                                                                                placeholder="540.000 đ" type="text">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row ">
+          <template v-for="(value, index) in sxandgido" :key="index">
+            <div class="col-lg-3 d-flex">
+                <div class="card flex-fill radius-10 border-bottom border-0 border-3 border-info">
+                    <img v-bind:src="value.hinh_anh" class="card-img-top "
+                        style="    width: 100%; height: 230px; object-fit: contain; vertical-align: middle;" alt="...">
+                    <div class="">
+                        <div v-if="value.is_flash_sale == 1" class="position-absolute top-0 end-0 m-3 product-discount">
+                            <span class="badge bg-warning mt-2">Sale</span>
+                        </div>
+                        <div v-if="value.is_noi_bat == 1" class="position-absolute top-0 end-0 m-3 product-discount">
+                            <span class="badge bg-danger mt-2">Nổi Bật</span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title cursor-pointer">
+                           {{ value.ten_san_pham }}
+                                <p class="mt-3">{{ value.tag }}</p>
+                           
+                        </h6>
+                        <div class="mt-auto">
+                            <div class="d-flex align-items-center fs-6">
+                                <div class="cursor-pointer">
+                                    <template v-for="items in value.sao_danh_gia" :key="items">
+                                        <i class="fa-solid fa-star text-warning"></i>
+                                    </template>
+                                    <template v-for="items in (5 - value.sao_danh_gia)" :key="items">
+                                        <i class="fa-regular fa-star"></i>
+                                    </template>
+                                </div>
+                                <p class="mb-0 ms-auto">4.2(182)</p>
+                            </div>
+                            <div class="clearfix mt-4">
+                                <button v-on:click="Object.assign(chitiet,value)" class="btn btn-outline-danger btn-sm  " data-bs-toggle="modal" data-bs-target="#chitiet">Chi Tiết</button>
+                                <p class="mb-0 float-end fw-bold"><span
+                                        class="me-2 text-decoration-line-through text-muted">{{ value.gia_ban
+                                        }}</span><span class="fs-5 text-danger">{{ value.gia_khuyen_mai }}</span>
+                                </p>
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+    <!-- Modal -->
+<div class="modal fade" id="chitiet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+               <div class="modal-body text-center">
+            <img
+              :src="chitiet.hinh_anh"
+              alt="iPhone 17 Pro Max"
+              class="img-fluid mb-3"
+            >
+            <h4>{{ chitiet.ten_san_pham }}</h4>
+            <p><b>Giá khuyến mãi:</b> {{chitiet.gia_khuyen_mai}}đ</p>
+            <p><b>Giá gốc:</b> <del>{{chitiet.gia_ban}}đ</del></p>
+            <p><b>Mô tả:</b>{{ chitiet.tag }}.</p>
+           
+          </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
 <script>
 export default {
-	name: 'TestIndex',
-	data() {
-		return {
-			stocks: [
-				{ code: 'VCB', price: 90000, change: 0, volume: 120000 },
-				{ code: 'FPT', price: 105000, change: 0, volume: 95000 },
-				{ code: 'VNM', price: 72000, change: 0, volume: 80000 },
-				{ code: 'MWG', price: 42000, change: 0, volume: 67000 },
-				{ code: 'HPG', price: 27000, change: 0, volume: 150000 },
-			],
-			chart: null,
-			priceHistory: [90000],
-			maxHistory: 30,
-		};
-	},
-	mounted() {
-		// Mô phỏng cập nhật realtime
-		// Load ApexCharts script nếu chưa có
-		if (!window.ApexCharts) {
-			const script = document.createElement('script');
-			// Đường dẫn tương đối cho Vite (public)
-			script.src = '/src/assets/plugins/apexcharts-bundle/js/apexcharts.min.js';
-			script.onload = this.initChart;
-			script.onerror = () => {
-				// Thử lại với đường dẫn public nếu không thành công
-				script.remove();
-				const script2 = document.createElement('script');
-				script2.src = '/assets/plugins/apexcharts-bundle/js/apexcharts.min.js';
-				script2.onload = this.initChart;
-				document.body.appendChild(script2);
-			};
-			document.body.appendChild(script);
-		} else {
-			this.initChart();
-		}
-		this.interval = setInterval(this.updateStocks, 1500);
-	},
-	methods: {
-		updateStocks() {
-			this.stocks = this.stocks.map((stock, idx) => {
-				const change = (Math.random() - 0.5) * 200;
-				const newPrice = Math.max(1000, stock.price + change);
-				// Lưu lịch sử giá cho mã đầu tiên
-				if (idx === 0) {
-					this.priceHistory.push(newPrice);
-					if (this.priceHistory.length > this.maxHistory) this.priceHistory.shift();
-					if (this.chart) {
-						// Cập nhật dữ liệu và trigger animation
-						this.chart.updateOptions({
-							series: [{ data: this.priceHistory }]
-						}, true, true);
-					}
-				}
-				return {
-					...stock,
-					change: newPrice - stock.price,
-					price: newPrice,
-					volume: stock.volume + Math.floor(Math.random() * 1000),
-				};
-			});
-		},
-		priceClass(stock) {
-			return stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
-		},
-		changeClass(stock) {
-			return stock.change > 0 ? 'up' : stock.change < 0 ? 'down' : '';
-		},
-		initChart() {
-			this.chart = new window.ApexCharts(document.querySelector("#stockChart"), {
-				chart: {
-					type: 'line',
-					height: 300,
-					animations: { enabled: true },
-					toolbar: { show: false },
-				},
-				series: [{ name: this.stocks[0].code, data: this.priceHistory }],
-				xaxis: { labels: { show: false } },
-				yaxis: { labels: { formatter: val => val.toFixed(0) } },
-				colors: ['#2563eb'],
-				stroke: { width: 3 },
-				grid: { borderColor: '#eee' },
-			});
-			this.chart.render();
-		}
-	},
-	beforeUnmount() {
-		clearInterval(this.interval);
-		if (this.chart) this.chart.destroy();
-	}
-};
-</script>
+  data() {
+    return {
+        chitiet:{},
+      sxandgido: [
+        {
+          id: 1,
+          ten_san_pham: "Laptop Gaming Acer Nitro 5",
+          slug_san_pham: "laptop-gaming-acer-nitro-5",
+          hinh_anh: "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6413/6413248cv1d.jpg",
+          is_flash_sale: 1,
+          is_noi_bat: 0,
+          gia_ban: "25,000,000đ",
+          gia_khuyen_mai: "22,500,000đ",
+          sao_danh_gia: 4,
+          tag: "Gaming, Hiệu năng cao"
+        },
+        {
+          id: 2,
+          ten_san_pham: "Điện thoại iPhone 17 Pro Max",
+          slug_san_pham: "iphone-17-pro-max",
+          hinh_anh: "https://9to5mac.com/wp-content/uploads/sites/6/2025/04/iphone-17-blue-mockup.jpg?quality=82&strip=all&w=1600",
+          is_flash_sale: 0,
+          is_noi_bat: 1,
+          gia_ban: "35,000,000đ",
+          gia_khuyen_mai: "32,000,000đ",
+          sao_danh_gia: 5,
+          tag: "Flagship, Camera đẹp"
+        },
+        {
+          id: 3,
+          ten_san_pham: "Tai nghe Sony WH-1000XM5",
+          slug_san_pham: "tai-nghe-sony-wh-1000xm5",
+          hinh_anh: "https://tse2.mm.bing.net/th/id/OIP.3EMl233EK2zAo5-jb92E7QGQGQ?pid=Api&P=0&h=220",
+          is_flash_sale: 1,
+          is_noi_bat: 1,
+          gia_ban: "9,000,000đ",
+          gia_khuyen_mai: "7,500,000đ",
+          sao_danh_gia: 5,
+          tag: "Noise Cancelling, Bluetooth"
+        },
+        {
+          id: 4,
+          ten_san_pham: "Chuột Logitech G Pro X Superlight",
+          slug_san_pham: "chuot-logitech-g-pro-x-superlight",
+          hinh_anh: "https://product.hstatic.net/200000722513/product/g-pro-x-superlight-wireless-black-666_83650815ce2e486f9108dbbb17c29159_1450bb4a9bd34dcb92fc77f627eb600d_master.jpg",
+          is_flash_sale: 1,
+          is_noi_bat: 0,
+          gia_ban: "3,500,000đ",
+          gia_khuyen_mai: "3,000,000đ",
+          sao_danh_gia: 4,
+          tag: "Chuột gaming, Siêu nhẹ"
+        },
+        {
+          id: 5,
+          ten_san_pham: "Bàn phím cơ Keychron K2",
+          slug_san_pham: "ban-phim-co-keychron-k2",
+          hinh_anh: "https://tse3.mm.bing.net/th/id/OIP.4lMOCH2Qp3k7ucjx6JSU9AHaEK?pid=Api&P=0&h=220",
+          is_flash_sale: 1,
+          is_noi_bat: 0,
+          gia_ban: "2,800,000đ",
+          gia_khuyen_mai: "2,400,000đ",
+          sao_danh_gia: 4,
+          tag: "Bluetooth, Hot-swap"
+        },
+         {
+          id: 6,
+          ten_san_pham: "Màn hình LG UltraGear 27GN950",
+          slug_san_pham: "man-hinh-lg-ultragear-27gn950",
+          hinh_anh: "https://nguyencongpc.vn/photos/17/LG-27GN950-B-2.JPG",
+          is_flash_sale: 1,
+          is_noi_bat: 1,
+          gia_ban: "18,000,000đ",
+          gia_khuyen_mai: "16,500,000đ",
+          sao_danh_gia: 5,
+          tag: "4K, 144Hz, Gaming"
+        },
+        {
+          id: 7,
+          ten_san_pham: "Máy ảnh Sony A7 IV",
+          slug_san_pham: "may-anh-sony-a7-iv",
+          hinh_anh: "https://mayanh9x.com/image/catalog/san-pham/mayanh-sony/sony-alpha-a7-iv/may-anh-Sony-Alpha-a7-IV-fulframe.jpg",
+          is_flash_sale: 0,
+          is_noi_bat: 1,
+          gia_ban: "50,000,000đ",
+          gia_khuyen_mai: "47,000,000đ",
+          sao_danh_gia: 5,
+          tag: "Full-frame, Quay phim 4K"
+        },
+        {
+          id: 8,
+          ten_san_pham: "Loa Bluetooth JBL Charge 5",
+          slug_san_pham: "loa-bluetooth-jbl-charge-5",
+          hinh_anh: "http://www.maccenter.vn/Audio/JBL-Charge5-Gray-A.jpg",
+          is_flash_sale: 1,
+          is_noi_bat: 0,
+          gia_ban: "4,200,000đ",
+          gia_khuyen_mai: "3,600,000đ",
+          sao_danh_gia: 4,
+          tag: "Chống nước, Bass mạnh"
+        }
+      ]
+    }
+  }
+}
 
-<style scoped>
-body {
-	min-height: 100vh;
-	background: #e805d5;
-	/* Animated gradient background */
-	background: linear-gradient(120deg, #e88018 0%, #0e1264 100%);
-	animation: gradientMove 10s ease-in-out infinite alternate;
-	background-size: 200% 200%;
-}
-@keyframes gradientMove {
-	0% {
-		background-position: 0% 50%;
-	}
-	100% {
-		background-position: 100% 50%;
-	}
-}
-.stock-realtime, .chart-container {
-	/* Glassmorphism effect */
-	background: rgba(255,255,255,0.85);
-	backdrop-filter: blur(8px) saturate(1.2);
-	-webkit-backdrop-filter: blur(8px) saturate(1.2);
-	box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10), 0 1.5px 8px 0 rgba(80,80,180,0.08);
-	border: 1.5px solid rgba(255,255,255,0.25);
-}
-.stock-realtime {
-	max-width: 600px;
-	margin: 48px auto 0 auto;
-	border-radius: 22px;
-	padding: 36px 28px 28px 28px;
-	text-align: center;
-	position: relative;
-	z-index: 2;
-	/* Glow effect */
-	box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10), 0 0 32px 0 #a5b4fc33;
-}
-.stock-realtime h2 {
-	font-size: 2.1rem;
-	font-weight: 800;
-	margin-bottom: 18px;
-	color: #22223b;
-	letter-spacing: 1px;
-	text-shadow: 0 2px 8px #a5b4fc33;
-}
-.stock-table {
-	width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	background: transparent;
-	border-radius: 14px;
-	overflow: hidden;
-	box-shadow: 0 1px 8px rgba(80,80,180,0.06);
-}
-.stock-table th, .stock-table td {
-	padding: 14px 16px;
-	text-align: center;
-	border-bottom: 1px solid #e5e7eb;
-	font-size: 1.08rem;
-	transition: background 0.2s, color 0.2s;
-}
-.stock-table th {
-	background: linear-gradient(90deg, #e0e7ef 60%, #f1f5f9 100%);
-	color: #374151;
-	font-weight: 700;
-	border-bottom: 2px solid #e0e7ef;
-	letter-spacing: 0.5px;
-}
-.stock-table tr:last-child td {
-	border-bottom: none;
-}
-.stock-table tr:hover {
-	background: #e0e7ef;
-	transition: background 0.2s;
-}
-.up {
-	color: #16a34a;
-	font-weight: bold;
-	letter-spacing: 0.5px;
-	text-shadow: 0 1px 6px #bbf7d0cc;
-}
-.down {
-	color: #dc2626;
-	font-weight: bold;
-	letter-spacing: 0.5px;
-	text-shadow: 0 1px 6px #fecaca99;
-}
-.chart-container {
-	max-width: 600px;
-	margin: 36px auto 0 auto;
-	border-radius: 22px;
-	padding: 28px 16px 12px 16px;
-	position: relative;
-	z-index: 1;
-	box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10), 0 0 32px 0 #a5b4fc33;
-}
-.chart-container h3 {
-	font-size: 1.2rem;
-	font-weight: 700;
-	color: #22223b;
-	margin-bottom: 12px;
-	text-shadow: 0 1px 6px #a5b4fc33;
-}
-@media (max-width: 700px) {
-	.stock-realtime, .chart-container {
-		max-width: 98vw;
-		padding: 10px 2vw;
-	}
-	.stock-table th, .stock-table td {
-		padding: 7px 4px;
-		font-size: 0.98rem;
-	}
-}
-.stock-realtime {
-	max-width: 600px;
-	margin: 40px auto 0 auto;
-	background: rgba(255,255,255,0.95);
-	border-radius: 18px;
-	box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-	padding: 32px 24px 24px 24px;
-	text-align: center;
-}
-.stock-realtime h2 {
-	font-size: 2rem;
-	font-weight: 700;
-	margin-bottom: 18px;
-	color: #22223b;
-	letter-spacing: 1px;
-}
-.stock-table {
-	width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	background: transparent;
-	border-radius: 12px;
-	overflow: hidden;
-	box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.stock-table th, .stock-table td {
-	padding: 12px 14px;
-	text-align: center;
-	border-bottom: 1px solid #e5e7eb;
-	font-size: 1.08rem;
-}
-.stock-table th {
-	background: #f1f5f9;
-	color: #374151;
-	font-weight: 600;
-	border-bottom: 2px solid #e0e7ef;
-}
-.stock-table tr:last-child td {
-	border-bottom: none;
-}
-.stock-table tr:hover {
-	background: #f3f4f6;
-	transition: background 0.2s;
-}
-.up {
-	color: #16a34a;
-	font-weight: bold;
-	letter-spacing: 0.5px;
-}
-.down {
-	color: #dc2626;
-	font-weight: bold;
-	letter-spacing: 0.5px;
-}
-.chart-container {
-	max-width: 2000px;
-	margin: 32px auto 0 auto;
-	background: rgba(255,255,255,0.97);
-	border-radius: 18px;
-	box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-	padding: 24px 16px 8px 16px;
-}
-.chart-container h3 {
-	font-size: 1.2rem;
-	font-weight: 600;
-	color: #22223b;
-	margin-bottom: 12px;
-}
-@media (max-width: 700px) {
-	.stock-realtime, .chart-container {
-		max-width: 98vw;
-		padding: 10px 2vw;
-	}
-	.stock-table th, .stock-table td {
-		padding: 7px 4px;
-		font-size: 0.98rem;
-	}
-}
-</style>
+</script>
+<style></style>
